@@ -8,7 +8,7 @@ import (
 	"net/http"
 	_ "net/http/pprof"
 
-	"github.com/christianparpart/marathon-go"
+	"github.com/christianparpart/serviced/marathon"
 	"github.com/gorilla/mux"
 	flag "github.com/ogier/pflag"
 )
