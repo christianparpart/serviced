@@ -1,10 +1,8 @@
 package marathon
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
+	"strings"
 )
 
 type PortMapping struct {
@@ -52,6 +50,7 @@ type UpgradeStrategy struct {
 }
 
 type App struct {
+	service               *Service
 	Id                    string
 	Cmd                   *string
 	Args                  *string
@@ -78,25 +77,11 @@ type App struct {
 	Labels          map[string]string
 }
 
-type jsonResponse struct {
-	App *App
-}
+func (app *App) Scale(instance_count uint) error {
+	// TODO
+	_, err := app.service.HttpPost(
+		"/v2/apps/TODO/scale",
+		strings.NewReader(fmt.Sprintf("%v", instance_count)))
 
-func GetApp(host string, port int, appPath string) (*App, error) {
-	var url = fmt.Sprintf("http://%v:%v/v2/apps%s", host, port, appPath)
-	response, err := http.Get(url)
-	if err != nil {
-		return nil, err
-	}
-
-	defer response.Body.Close()
-	output, err := ioutil.ReadAll(response.Body)
-
-	var v jsonResponse
-	err = json.Unmarshal(output, &v)
-	if err != nil {
-		return nil, err
-	}
-
-	return v.App, nil
+	return err
 }

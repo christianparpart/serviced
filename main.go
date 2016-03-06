@@ -24,7 +24,14 @@ func GetDeployedApp(w http.ResponseWriter, r *http.Request) {
 	app := vars["app"]
 	path := fmt.Sprintf("/%v/%v", env, app)
 
-	mapp, err := marathon.GetApp(marathonHost, marathonPort, path)
+	ms, err := marathon.NewService(marathonHost, marathonPort)
+	if err != nil {
+		log.Printf("Failed to connect to Marathon endpoint. %v\n", err)
+		w.WriteHeader(http.StatusServiceUnavailable)
+		return
+	}
+
+	mapp, err := ms.GetApp(path)
 	if err != nil {
 		log.Printf("Failed to get app. %v\n", err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -60,6 +67,18 @@ func main() {
 	marathonPort = *marathonPortF
 
 	r := mux.NewRouter()
+
+	db, err := NewDB()
+	if err != nil {
+		log.Fatalf("NewDB error. %+v\n", err)
+	}
+
+	db.Connect()
+	if err != nil {
+		log.Fatalf("NewDB error. %+v\n", err)
+	}
+
+	log.Printf("db: %+v\n", db)
 
 	r.Path("/deployments/{env}/{app}").
 		HandlerFunc(GetDeployedApp).
