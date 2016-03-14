@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"net"
 	"net/http"
 )
@@ -27,7 +26,6 @@ func NewService(host net.IP, port uint) (*Service, error) {
 
 func (service *Service) HttpGet(path string) ([]byte, error) {
 	url := service.BaseURL + path
-	log.Printf("HttpGet: %v\n", url)
 	response, err := http.Get(url)
 	if err != nil {
 		return nil, err
