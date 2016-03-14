@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
+	"net"
 	"net/http"
 )
 
@@ -16,7 +18,7 @@ type jsonResponse struct {
 	App *App
 }
 
-func NewService(host string, port int) (*Service, error) {
+func NewService(host net.IP, port uint) (*Service, error) {
 	var url = fmt.Sprintf("http://%v:%v", host, port)
 	var ms = &Service{BaseURL: url}
 
@@ -24,7 +26,9 @@ func NewService(host string, port int) (*Service, error) {
 }
 
 func (service *Service) HttpGet(path string) ([]byte, error) {
-	response, err := http.Get(service.BaseURL + path)
+	url := service.BaseURL + path
+	log.Printf("HttpGet: %v\n", url)
+	response, err := http.Get(url)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +50,7 @@ func (service *Service) HttpPost(path string, body io.Reader) ([]byte, error) {
 }
 
 func (service *Service) GetApp(path string) (*App, error) {
-	jsonBlob, err := service.HttpGet("/v2/apps" + path)
+	jsonBlob, err := service.HttpGet("/v2/apps" + path + "?embed=apps.tasks")
 	if err != nil {
 		return nil, err
 	}

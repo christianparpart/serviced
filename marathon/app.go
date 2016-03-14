@@ -3,6 +3,7 @@ package marathon
 import (
 	"fmt"
 	"strings"
+	"time"
 )
 
 type PortMapping struct {
@@ -32,6 +33,14 @@ type HealthCheck struct {
 	IgnoreHttp1xx          bool
 }
 
+type HealthCheckResult struct {
+	Alive               bool
+	ConsecutiveFailures uint
+	FirstSuccess        *time.Time
+	LastFailure         *time.Time
+	LastSuccess         *time.Time
+}
+
 type ContainerVolume struct {
 	ContainerPath string
 	HostPath      string
@@ -49,6 +58,18 @@ type UpgradeStrategy struct {
 	MaximumOverCapacity   float64
 }
 
+type Task struct {
+	Id                 string
+	Host               string
+	Ports              []int
+	StartedAt          time.Time
+	StagedAt           time.Time
+	Version            time.Time
+	SlaveId            string
+	AppId              string
+	HealthCheckResults []HealthCheckResult
+}
+
 type App struct {
 	service               *Service
 	Id                    string
@@ -57,7 +78,7 @@ type App struct {
 	User                  *string
 	Env                   map[string]string
 	Instances             int
-	Cpus                  int
+	Cpus                  float64
 	Mem                   int
 	Disk                  int
 	Executor              string
@@ -75,6 +96,7 @@ type App struct {
 	// TODO Dependencies []
 	UpgradeStrategy UpgradeStrategy
 	Labels          map[string]string
+	Tasks           []Task
 }
 
 func (app *App) Scale(instance_count uint) error {
