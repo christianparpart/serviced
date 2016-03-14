@@ -13,12 +13,17 @@ type PortMapping struct {
 	Protocol      string
 }
 
+type KeyValuePair struct {
+	Key   string
+	Value *string
+}
+
 type DockerContainer struct {
 	Image          string
 	Network        string
 	PortMappings   []PortMapping
 	Privileged     bool
-	Parameters     [][]string
+	Parameters     []KeyValuePair
 	ForcePullImage bool
 }
 
@@ -70,6 +75,13 @@ type Task struct {
 	HealthCheckResults []HealthCheckResult
 }
 
+type FetchInfo struct {
+	Uri        string
+	Extract    bool
+	Executable bool
+	Cache      bool
+}
+
 type App struct {
 	service               *Service
 	Id                    string
@@ -84,7 +96,7 @@ type App struct {
 	Executor              string
 	Constraints           [][]string
 	Uris                  []string
-	Fetch                 []string
+	Fetch                 []FetchInfo
 	StoreUrls             []string
 	Ports                 []int
 	RequirePorts          bool

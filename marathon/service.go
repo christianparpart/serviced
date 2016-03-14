@@ -13,10 +13,6 @@ type Service struct {
 	BaseURL string
 }
 
-type jsonResponse struct {
-	App *App
-}
-
 func NewService(host net.IP, port uint) (*Service, error) {
 	var url = fmt.Sprintf("http://%v:%v", host, port)
 	var ms = &Service{BaseURL: url}
@@ -53,7 +49,26 @@ func (service *Service) GetApp(path string) (*App, error) {
 		return nil, err
 	}
 
+	type jsonResponse struct {
+		App *App
+	}
+
 	var v jsonResponse
 	err = json.Unmarshal(jsonBlob, &v)
 	return v.App, err
+}
+
+func (service *Service) GetApps() ([]*App, error) {
+	jsonBlob, err := service.HttpGet("/v2/apps?embed=apps.tasks")
+	if err != nil {
+		return nil, err
+	}
+
+	type jsonResponse struct {
+		Apps []*App
+	}
+
+	var v jsonResponse
+	err = json.Unmarshal(jsonBlob, &v)
+	return v.Apps, err
 }
