@@ -14,8 +14,8 @@ import (
 )
 
 var (
-	marathonHost string = "localhost"
-	marathonPort int    = 8080
+	marathonHost net.IP = net.ParseIP("127.0.0.1")
+	marathonPort uint   = 8080
 )
 
 func GetDeployedApp(w http.ResponseWriter, r *http.Request) {
@@ -58,22 +58,22 @@ func DeployAppRelease(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	marathonHostF := flag.StringP("marathon-host", "H", marathonHost, "Marathon Host")
-	marathonPortF := flag.IntP("marathon-port", "P", marathonPort, "Marathon Port.")
+	marathonHostF := flag.IPP("marathon-ip", "H", marathonHost, "Marathon endpoint IP address")
+	marathonPortF := flag.UintP("marathon-port", "P", marathonPort, "Marathon endpoint Port number.")
 	serveAddr := flag.IPP("listen-addr", "l", net.IPv4zero, "Listener IP address.")
 	servePort := flag.IntP("listen-port", "p", 3000, "Listener port number.")
+	dbHostname := flag.StringP("db-host", "", "localhost", "mySQL server hostname.")
+	dbPort := flag.IntP("db-port", "", 3306, "mySQL server port number.")
+	dbUsername := flag.StringP("db-username", "", "root", "database username.")
+	dbPassword := flag.StringP("db-password", "", "", "database password.")
+	dbName := flag.StringP("db-name", "", "serviced", "database name.")
 	flag.Parse()
 	marathonHost = *marathonHostF
 	marathonPort = *marathonPortF
 
 	r := mux.NewRouter()
 
-	db, err := NewDB()
-	if err != nil {
-		log.Fatalf("NewDB error. %+v\n", err)
-	}
-
-	db.Connect()
+	db, err := OpenDB(*dbHostname, *dbPort, *dbUsername, *dbPassword, *dbName)
 	if err != nil {
 		log.Fatalf("NewDB error. %+v\n", err)
 	}

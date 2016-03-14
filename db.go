@@ -6,19 +6,22 @@ import (
 )
 
 type DB struct {
+	hostname string
+	port     int
 	username string
 	password string
-	hostname string
 	name     string
 	charset  string
 	db       *sql.DB
 }
 
-func NewDB() (*DB, error) {
-	db_user := "root"
-	db_pass := ""
+func OpenDB(hostname string, port int,
+	username string, password string, name string) (*DB, error) {
+
 	db_host := "localhost"
 	db_name := "serviced"
+	db_user := "root"
+	db_pass := ""
 	db_charset := "utf8"
 
 	var db *DB = &DB{
@@ -28,7 +31,9 @@ func NewDB() (*DB, error) {
 		name:     db_name,
 		charset:  db_charset}
 
-	return db, nil
+	err := db.Connect()
+
+	return db, err
 }
 
 func (db *DB) Connect() error {
