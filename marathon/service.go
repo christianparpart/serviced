@@ -55,6 +55,7 @@ func (service *Service) GetApp(path string) (*App, error) {
 
 	var v jsonResponse
 	err = json.Unmarshal(jsonBlob, &v)
+
 	return v.App, err
 }
 

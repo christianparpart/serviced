@@ -7,9 +7,9 @@ import (
 )
 
 type PortMapping struct {
-	ContainerPort int
-	HostPort      int
-	ServicePort   int
+	ContainerPort uint
+	HostPort      uint
+	ServicePort   uint
 	Protocol      string
 }
 
@@ -30,7 +30,7 @@ type DockerContainer struct {
 type HealthCheck struct {
 	Protocol               string
 	Path                   string
-	PortIndex              uint
+	PortIndex              int
 	GracePeriodSeconds     uint
 	IntervalSeconds        uint
 	TimeoutSeconds         uint
@@ -55,7 +55,7 @@ type ContainerVolume struct {
 type AppContainer struct {
 	Type    string
 	Volumes []ContainerVolume
-	Docker  DockerContainer
+	Docker  *DockerContainer
 }
 
 type UpgradeStrategy struct {
@@ -66,9 +66,9 @@ type UpgradeStrategy struct {
 type Task struct {
 	Id                 string
 	Host               string
-	Ports              []int
-	StartedAt          time.Time
-	StagedAt           time.Time
+	Ports              []uint
+	StartedAt          *time.Time
+	StagedAt           *time.Time
 	Version            time.Time
 	SlaveId            string
 	AppId              string
@@ -89,16 +89,16 @@ type App struct {
 	Args                  *string
 	User                  *string
 	Env                   map[string]string
-	Instances             int
+	Instances             uint
 	Cpus                  float64
-	Mem                   int
-	Disk                  int
+	Mem                   uint
+	Disk                  uint
 	Executor              string
 	Constraints           [][]string
 	Uris                  []string
 	Fetch                 []FetchInfo
 	StoreUrls             []string
-	Ports                 []int
+	Ports                 []uint
 	RequirePorts          bool
 	BackoffSeconds        uint
 	BackoffFactor         float64
@@ -109,6 +109,16 @@ type App struct {
 	UpgradeStrategy UpgradeStrategy
 	Labels          map[string]string
 	Tasks           []Task
+}
+
+func (app *App) GetTaskById(taskId string) *Task {
+	for i := range app.Tasks {
+		if app.Tasks[i].Id == taskId {
+			return &app.Tasks[i]
+		}
+	}
+
+	return nil
 }
 
 func (app *App) Scale(instance_count uint) error {
