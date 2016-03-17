@@ -129,3 +129,13 @@ func (app *App) Scale(instance_count uint) error {
 
 	return err
 }
+
+func (task *Task) IsAlive() bool {
+	for _, healthCheckResult := range task.HealthCheckResults {
+		if healthCheckResult.Alive == false {
+			return false
+		}
+	}
+
+	return true
+}
