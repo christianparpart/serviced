@@ -18,6 +18,11 @@ type KeyValuePair struct {
 	Value *string
 }
 
+const (
+	NetworkBridged = "BRIDGE"
+	NetworkHost    = "HOST"
+)
+
 type DockerContainer struct {
 	Image          string
 	Network        string
